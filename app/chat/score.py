@@ -1,6 +1,7 @@
 import random
 from app.chat.redis import client
 
+# Randomly selects a component from the component map based on the scores
 def random_component_by_score(component_type, component_map):
     # Make sure component_type is 'llm', 'retriever', or 'memory'
     if component_type not in ["llm", "retriever", "memory"]:
@@ -32,6 +33,7 @@ def random_component_by_score(component_type, component_map):
         if random_val <= cumulative:
             return name
 
+# Scores a conversation
 def score_conversation(
     conversation_id: str, score: float, llm: str, retriever: str, memory: str
 ) -> None:
@@ -46,15 +48,16 @@ def score_conversation(
     client.hincrby("memory_score_values", memory, score)
     client.hincrby("memory_score_counts", memory, 1)
 
+# Gets the scores for all the components
 def get_scores():
     aggregate = {"llm": {}, "retriever": {}, "memory": {}}
-
+    # Loop over the component types and get the scores for each component
     for component_type in aggregate.keys():
         values = client.hgetall(f"{component_type}_score_values")
         counts = client.hgetall(f"{component_type}_score_counts")
 
         names = values.keys()
-
+        # Loop over the names and get the average score for each component
         for name in names:
             score = int(values.get(name, 1))
             count = int(counts.get(name, 1))

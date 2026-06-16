@@ -10,7 +10,7 @@ def create_embeddings_for_pdf(pdf_id: str, pdf_path: str):
 
     loader = PyPDFLoader(pdf_path)
     docs = loader.load_and_split(text_splitter)
-
+    # Add the metadata to the documents
     for doc in docs:
         doc.metadata = {
             "page": doc.metadata["page"],
