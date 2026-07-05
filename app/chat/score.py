@@ -38,13 +38,18 @@ def score_conversation(
     conversation_id: str, score: float, llm: str, retriever: str, memory: str
 ) -> None:
     score = min(max(score, 0), 1)
-
+    # Increment the score for the given component
+    # Increment the number of times the component has been voted on
     client.hincrby("llm_score_values", llm, score)
     client.hincrby("llm_score_counts", llm, 1)
 
+    # Increment the score for the given component
+    # Increment the number of times the component has been voted on
     client.hincrby("retriever_score_values", retriever, score)
     client.hincrby("retriever_score_counts", retriever, 1)
 
+    # Increment the score for the given component
+    # Increment the number of times the component has been voted on
     client.hincrby("memory_score_values", memory, score)
     client.hincrby("memory_score_counts", memory, 1)
 
@@ -53,11 +58,15 @@ def get_scores():
     aggregate = {"llm": {}, "retriever": {}, "memory": {}}
     # Loop over the component types and get the scores for each component
     for component_type in aggregate.keys():
+        # Get the scores for the given component type
+        # Get the number of times each component has been voted on
         values = client.hgetall(f"{component_type}_score_values")
+        # Get the sum total scores for the given component type
         counts = client.hgetall(f"{component_type}_score_counts")
 
+        # Get all the valid component names from the component map
         names = values.keys()
-        # Loop over the names and get the average score for each component
+        # Loop over the names and calculate the average score for each component
         for name in names:
             score = int(values.get(name, 1))
             count = int(counts.get(name, 1))
